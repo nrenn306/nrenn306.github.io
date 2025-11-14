@@ -44,11 +44,102 @@
     </article>
 
     <article class="hidden" id="singleproduct">
+        <nav id="breadcrumb">
+            <a href="#">Home</a>
+            <a href="#">Gender(replace this)</a>
+            <a href="#">Category(replace this)</a>
+            <span>Product Title</span>
+        </nav>
+        </article>
+        <section id="productPage">
+            <section id="productImages">
+                <div id="mainImage">
+                    <img>
+                </div>
+                <div id="smallImages">
+                    <img> 
+                    <img>
+                </div>
+            </section>
 
+            <section id="productDescription">
+                <h1 id="productTitle"></h1>
+                <p id ="productPrice"></p>
+                <p id="productDescription"></p>
+                <p id="productMaterial"></p>
+
+                <div id="quantity">
+                    <label>Quantity</label>
+                    <input> <!-- increase decrease prices based on click here -->
+                </div>
+
+                <div id="colourOptions">
+                    <!-- grab colour options from data to put here hehe
+                    <button class="productColour" style=backgroundColour></button>
+                    -->
+                </div>
+                <button id="addCart">+Add to Cart</button>
+            </section>
+
+            <section id="relatedProducts">
+                <h2>Related Products</h2>
+
+                <ul id="relatedList">
+                    <!-- grab images to put here hehe 
+                    <li> 
+                    <img>
+                    <h3>title
+                    <p>price
+                    <button>+
+                    </li>
+                    -->
+                </ul>
+            </section>
+
+        </section>
     </article>
     
     <article class="hidden" id="shoppingCart">
-        <p>c</p>
+        <h1>Shopping Cart</h1>
+        <section class="cartItems">
+            <table class="cartTable">
+                <thread>
+                    <tr>
+                        <th>Items</th>
+                        <th>Color</th>
+                        <th>Size</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thread>
+                <tbody id="cartBody">
+                    <!--loop through cart items, display image of item, product title, colour, size, quanity, subtotal -->
+                    <!-- use td-->
+                </tbody>
+            </table>
+        </section>
+
+        <section class="shippingSummary">
+            <div class="shipping">
+                <h2>Shipping</h2>
+                <select id="shippingType" placeholder="Standard">
+                    <option value="standard">Standard</option>
+                    <option value="express">Express</option>
+                    <option value="priority">Priority</option>
+                </select>
+                <select id="shippingType" placeholder="Canada">
+                    <option value="canada">Canada</option>
+                    <option value="unitedStates">United States</option>
+                    <option value="international">International</option>
+                </select>
+            </div>
+
+            <div class="summary">
+                <h2>Merchandise</h2>
+                
+            </div>
+        </section>
     </article>
 
     <dialog id="about">
