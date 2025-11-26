@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    //const products = JSON.parse(content);
     const url = "https://gist.githubusercontent.com/rconnolly/d37a491b50203d66d043c26f33dbd798/raw/37b5b68c527ddbe824eaed12073d266d5455432a/clothing-compact.json";
 
-    
-    /* --------------- utility functions ---------------- */
+    /* ---------------- utility functions ---------------- */
     function retrieveStorage() {
         return JSON.parse(localStorage.getItem('products')) || [];
     }
@@ -29,13 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error(error));
     }
 
+    // check if data already exists in local storage or not 
     const products = retrieveStorage();
-    if (products) {
+    if (products && products.length > 0) {
         main(products);
     } else {
         fetchAndStore();
     }
     
+    // toggles triangle for browse filter 
     function toggleTriagngle(name) {
         const p = document.querySelector("#" + name + " p");
         p.textContent = p.textContent.endsWith('▲')
@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             : p.textContent.replace('▼', '▲');
     }
 
-    function populateFilter(data) {
+    // populates category filter 
+    function populateCategoryFilter(data) {
         const categoryCheckBox = document.querySelector("#categoryCheckBox");
         categoryCheckBox.classList.toggle("hidden");
 
@@ -76,13 +77,105 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // navigation
-    const home = document.querySelector("#home");
-    const browse = document.querySelector("#browse");
-    const about = document.querySelector("#about");
-    const shoppingCart = document.querySelector("#shoppingCart");
+    // populates size filter
+    function populateSizeFilter(data) {
+        const sizeCheckBox = document.querySelector("#sizeCheckBox");
+        sizeCheckBox.classList.toggle("hidden");
 
-    document.querySelector("nav").addEventListener('click', (e) => {
+        sizeCheckBox.innerHTML = "";
+
+        toggleTriagngle("size");
+
+        const sizes = [];
+        for (let product of data) {
+            for (let s of product.sizes) {
+                if (!sizes.includes(s)) {
+                    sizes.push(s)
+                }
+            }
+        }
+
+        for (let s of sizes) {
+            const input = document.createElement("input");
+            input.type = "checkbox";
+
+            input.setAttribute("id", s);
+            input.setAttribute("name", s);
+            input.setAttribute("value", s);
+            
+            const label = document.createElement("label");
+            label.textContent = s;
+
+            sizeCheckBox.appendChild(input);
+            sizeCheckBox.appendChild(label);
+        }
+    }
+
+    // sort sizes 
+    function sortSize(sizes) {
+        
+    }
+
+    // populates color filter 
+    function populateColorsFilter(data) {
+        const colorsCheckBox = document.querySelector("#colorsCheckBox");
+        colorsCheckBox.classList.toggle("hidden");
+
+        colorsCheckBox.innerHTML = "";
+
+        toggleTriagngle("colors");
+
+        const colors = [];
+        for (let product of data) {
+            for (let c of product.color) {
+                if (!colors.includes(c.name)) {
+                    colors.push(c.name);
+            }
+            }
+        
+        }
+
+        colors.sort();
+
+        for (let c of colors) {
+            const input = document.createElement("input");
+            input.type = "checkbox";
+
+            input.setAttribute("id", c);
+            input.setAttribute("name", c);
+            input.setAttribute("value", c);
+            
+            const label = document.createElement("label");
+            label.textContent = c;
+
+            colorsCheckBox.appendChild(input);
+            colorsCheckBox.appendChild(label);
+        }
+    }
+
+    // populates all filters according to what was clicked 
+    function populateFilter(e, data) {
+        if (e.target.nodeName == "P") {
+                if (e.target.textContent.includes("Gender")) {
+                    document.querySelector("#genderCheckBox").classList.toggle("hidden");
+                    toggleTriagngle("gender")
+                } else if (e.target.textContent.includes("Category")) {
+                    populateCategoryFilter(data);
+                } else if (e.target.textContent.includes("Size")) {
+                    populateSizeFilter(data);
+                } else if (e.target.textContent.includes("Colors")) {
+                    populateColorsFilter(data);
+                }
+            }
+    }
+
+    // navigation
+    function navigationHandler(e) {
+        const home = document.querySelector("#home");
+        const browse = document.querySelector("#browse");
+        const about = document.querySelector("#about");
+        const shoppingCart = document.querySelector("#shoppingCart");
+
         if(e.target.nodeName == "IMG") {
             showView("home")
             return;
@@ -96,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (e.target.nodeName == "H3") {
             showView("shoppingCart");
         }
-    });
+    }
 
     function showView(viewName) {
         home.classList.add("hidden");
@@ -109,98 +202,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // handling about pop up
-    document.querySelector("#close").addEventListener('click', () => {
+    function aboutPageHandler() {
+        document.querySelector("#close").addEventListener('click', () => {
         document.querySelector("#about").close();
-    });
-    document.querySelector("#x").addEventListener('click', () => {
+        });
+        document.querySelector("#x").addEventListener('click', () => {
         document.querySelector("#about").close();
-    });
-
-    // populate filter
-    // category
-    /*
-    const categoryTemplate = document.querySelector("#category template");
-    const category = document.querySelector("#category");
-
-    const categories = [];
-    for (let product of products) {
-        if (!categories.includes(product.category)) {
-            categories.push(product.category);
-        }
-    }
-    categories.sort();
-    for (let c of categories) {
-        const clone = categoryTemplate.content.cloneNode(true);
-
-        const input = clone.querySelector("input");
-        input.setAttribute("id", c);
-        input.setAttribute("name", c);
-        input.setAttribute("value", c);
-        
-        const label = clone.querySelector("label");
-        label.textContent = c;
-
-        category.appendChild(clone);
-    }
-        */
-
-    // size **needs to be worked on still so it's in order
-    const sizeTemplate = document.querySelector("#size template");
-    const size = document.querySelector("#size");
-
-    const sizes = [];
-    for (let product of products) {
-        for (let s of product.sizes) {
-            if (!sizes.includes(s)) {
-                sizes.push(s)
-            }
-        }
-    }
-
-    for (let s of sizes) {
-        const clone = sizeTemplate.content.cloneNode(true);
-
-        const input = clone.querySelector("input");
-        input.setAttribute("id", s);
-        input.setAttribute("name", s);
-        input.setAttribute("value", s);
-        
-        const label = clone.querySelector("label");
-        label.textContent = s;
-
-        size.appendChild(clone);
-    }
-
-    // colors
-    const colorsTemplate = document.querySelector("#colors template");
-    const colorsDiv = document.querySelector("#colors");
-
-    const colors = [];
-    for (let product of products) {
-        for (let c of product.color) {
-            if (!colors.includes(c.name)) {
-            colors.push(c.name);
-        }
-        }
-    
-    }
-    colors.sort();
-    for (let c of colors) {
-        const clone = colorsTemplate.content.cloneNode(true);
-
-        const input = clone.querySelector("input");
-        input.setAttribute("id", c);
-        input.setAttribute("name", c);
-        input.setAttribute("value", c);
-        
-        const label = clone.querySelector("label");
-        label.textContent = c;
-
-        colorsDiv.appendChild(clone);
+        });
     }
 
     function main(data) {
-        document.querySelector("#category p").addEventListener('click', () => { populateFilter(data) });
+        aboutPageHandler();
+        document.querySelector("#filter").addEventListener('click', (e) => { populateFilter(e, data); });
+        document.querySelector("nav").addEventListener('click', (e) => {navigationHandler(e)});
     }
 
 });
