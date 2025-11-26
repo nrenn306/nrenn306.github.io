@@ -1,6 +1,81 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const products = JSON.parse(content);
+    //const products = JSON.parse(content);
+    const url = "https://gist.githubusercontent.com/rconnolly/d37a491b50203d66d043c26f33dbd798/raw/37b5b68c527ddbe824eaed12073d266d5455432a/clothing-compact.json";
+
     
+    /* --------------- utility functions ---------------- */
+    function retrieveStorage() {
+        return JSON.parse(localStorage.getItem('products')) || [];
+    }
+
+    function updateStorage(data) {
+        localStorage.setItem('products', JSON.stringify(data));
+    }
+
+    // fetch and save data to local storage and run main()
+    function fetchAndStore() {
+        fetch(url)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new error("fetch failed");
+            }
+        })
+        .then(data => {
+            updateStorage(data);
+            main(data);
+        })
+        .catch(error => console.error(error));
+    }
+
+    const products = retrieveStorage();
+    if (products) {
+        main(products);
+    } else {
+        fetchAndStore();
+    }
+    
+    function toggleTriagngle(name) {
+        const p = document.querySelector("#" + name + " p");
+        p.textContent = p.textContent.endsWith('▲')
+            ? p.textContent.replace('▲', '▼')
+            : p.textContent.replace('▼', '▲');
+    }
+
+    function populateFilter(data) {
+        const categoryCheckBox = document.querySelector("#categoryCheckBox");
+        categoryCheckBox.classList.toggle("hidden");
+
+        categoryCheckBox.innerHTML = "";
+
+        toggleTriagngle("category");
+
+        const categories = [];
+        for (let product of data) {
+            if (!categories.includes(product.category)) {
+                categories.push(product.category);
+            }
+        }
+    
+        categories.sort();
+        
+        for (let c of categories) {
+            const input = document.createElement("input");
+            input.type = "checkbox";
+
+            input.setAttribute("id", c);
+            input.setAttribute("name", c);
+            input.setAttribute("value", c);
+            
+            const label = document.createElement("label");
+            label.textContent = c;
+
+            categoryCheckBox.appendChild(input);
+            categoryCheckBox.appendChild(label);
+        }
+    }
+
     // navigation
     const home = document.querySelector("#home");
     const browse = document.querySelector("#browse");
@@ -43,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // populate filter
     // category
+    /*
     const categoryTemplate = document.querySelector("#category template");
     const category = document.querySelector("#category");
 
@@ -66,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         category.appendChild(clone);
     }
+        */
 
     // size **needs to be worked on still so it's in order
     const sizeTemplate = document.querySelector("#size template");
@@ -120,6 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
         label.textContent = c;
 
         colorsDiv.appendChild(clone);
+    }
+
+    function main(data) {
+        document.querySelector("#category p").addEventListener('click', () => { populateFilter(data) });
     }
 
 });
