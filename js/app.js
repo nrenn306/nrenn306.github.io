@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let c of categories) {
             const input = document.createElement("input");
             input.type = "checkbox";
+            input.classList.add("category");
 
             input.setAttribute("id", c);
             input.setAttribute("name", c);
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const label = document.createElement("label");
             label.textContent = c;
+            label.setAttribute("for", c);
 
             categoryCheckBox.appendChild(input);
             categoryCheckBox.appendChild(label);
@@ -98,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let s of sizes) {
             const input = document.createElement("input");
             input.type = "checkbox";
+            input.classList.add("size");
 
             input.setAttribute("id", s);
             input.setAttribute("name", s);
@@ -105,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const label = document.createElement("label");
             label.textContent = s;
+            label.setAttribute("for", s);
 
             sizeCheckBox.appendChild(input);
             sizeCheckBox.appendChild(label);
@@ -128,28 +132,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const colors = [];
         for (let product of data) {
             for (let c of product.color) {
-                if (!colors.includes(c.name)) {
-                    colors.push(c.name);
+                if (colors.findIndex(col => col.name === c.name) === -1) {
+                    colors.push(c);
+                }
             }
-            }
-        
+
         }
 
-        colors.sort();
+        colors.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
+            return 0;
+        });
 
         for (let c of colors) {
+            //console.log(c);
             const input = document.createElement("input");
             input.type = "checkbox";
+            input.classList.add("color");
 
-            input.setAttribute("id", c);
-            input.setAttribute("name", c);
-            input.setAttribute("value", c);
+            input.setAttribute("id", c.name);
+            input.setAttribute("name", c.name);
+            input.setAttribute("value", c.name);
             
             const label = document.createElement("label");
-            label.textContent = c;
+            label.textContent = c.name;
+            label.setAttribute("for", c.name);
+
+            const div = document.createElement("div");
+            div.style.backgroundColor = c.hex;
+            div.style.height = "20px";
+            div.style.width = "20px";
+            div.style.border = "1px solid black";
+            div.setAttribute("for", c.name);
 
             colorsCheckBox.appendChild(input);
             colorsCheckBox.appendChild(label);
+            label.appendChild(div);
         }
     }
 
@@ -175,6 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const browse = document.querySelector("#browse");
         const about = document.querySelector("#about");
         const shoppingCart = document.querySelector("#shoppingCart");
+        
+        document.querySelector("#singleProduct").classList.add("hidden");
 
         if(e.target.nodeName == "IMG") {
             showView("home")
@@ -204,17 +225,187 @@ document.addEventListener('DOMContentLoaded', () => {
     // handling about pop up
     function aboutPageHandler() {
         document.querySelector("#close").addEventListener('click', () => {
-        document.querySelector("#about").close();
+            document.querySelector("#about").close();
         });
         document.querySelector("#x").addEventListener('click', () => {
-        document.querySelector("#about").close();
+            document.querySelector("#about").close();
         });
     }
 
+    // handle filter depending on what filter is checked 
+    function filterHandler(data) {
+        const checked = [...document.querySelectorAll('#filter input:checked')];
+
+        const filters = {
+            gender: checked.filter(p => p.classList.contains("gender")).map(p => p.id),
+            category: checked.filter(p => p.classList.contains("category")).map(p => p.id),
+            size: checked.filter(p => p.classList.contains("size")).map(p => p.id),
+            color: checked.filter(p => p.classList.contains("color")).map(p => p.id)
+        };
+
+        let results = data;
+
+        if (filters.gender.length > 0) {
+            results = results.filter(p => filters.gender.includes(p.gender));
+        }
+        if (filters.category.length > 0) {
+            results = results.filter(p => filters.category.includes(p.category));
+        }
+        if (filters.size.length > 0) {
+            results = results.filter(p => p.sizes.some(s => filters.size.includes(s)));
+        }
+        if (filters.color.length > 0) {
+            results = results.filter(p => p.color.some(c => filters.color.includes(c.name)));
+        }
+
+        showSelectedFilters(checked, data);
+
+        return results;
+    
+    }
+
+    function applyFiltersAndSort(data) {
+        const results = filterHandler(data);
+        const sortType = document.querySelector("#sort").value;
+
+        if (sortType == "nameAZ") {
+            results.sort((a, b) => {
+                if (a.name < b.name) return -1;
+                if (a.name > b.name) return 1;
+                return 0;
+            });
+        } else if (sortType == "nameZA") {
+            results.sort((a, b) => {
+                if (a.name > b.name) return -1;
+                if (a.name < b.name) return 1;
+                return 0;
+            });
+        } else if (sortType == "priceHL") {
+            results.sort((a, b) => b.price - a.price);
+        } else if (sortType == "priceLH") {
+            results.sort((a, b) => a.price - b.price);
+        } else if (sortType == "category") {
+            results.sort((a, b) => {
+                if (a.category < b.category) return -1;
+                if (a.category > b.category) return 1;
+                return 0;
+            });
+        }
+
+        console.log(results);
+        populateBrowsePage(results);
+        
+    }
+
+    function showSelectedFilters(checked, data) {
+        const div = document.querySelector("#selectedFilters");
+        div.innerHTML = "";
+        for(let c of checked) {
+            const button = document.createElement("button");
+            if (c.id == "mens" || c.id == "womens") {
+                button.textContent = document.querySelector(`label[for="${c.id}"]`).textContent;
+            } else {
+                button.textContent = c.id;
+            }
+
+            div.appendChild(button);
+
+            // deletes filter if button is clicked 
+            button.addEventListener('click', (e) => {
+                button.remove();
+                if (c.id == "mens" || c.id == "womens") {
+                    if (button.textContent == document.querySelector(`label[for="${c.id}"]`).textContent) {
+                        c.checked = false;
+                    }
+                } else if (button.textContent == c.id) {
+                    c.checked = false;
+                }
+                applyFiltersAndSort(data);
+            });
+            
+        }
+    }
+
+    function populateBrowsePage(data) {
+        const template = document.querySelector("#results template");
+        const parent = document.querySelector("#browseResults");
+
+        parent.innerHTML = "";
+
+        for (let d of data) {
+            const clone = template.content.cloneNode(true);
+
+            const img = clone.querySelector("img");
+            img.setAttribute("alt", `${d.name}`);
+            img.id = d.id;
+
+            const title = clone.querySelector(".browseResultProductTitle");
+            title.textContent = d.name;
+            title.id = d.id;
+
+            const price = clone.querySelector(".browseResultProductPrice");
+            price.textContent = "$" + d.price;
+            price.id = d.id;
+
+            const button = clone.querySelector(".addBtn");
+
+            parent.appendChild(clone);
+
+            button.addEventListener('click', () => {addToCart();});
+            parent.addEventListener('click', (e) => showSingleProduct(e, data));
+        }
+    }
+
+    function clearFilter(data) {
+        const checked = [...document.querySelectorAll('#filter input:checked')];
+        for (let c of checked) {
+            c.checked = false;
+        }
+        checked.length = 0;
+
+        showSelectedFilters(checked, data);
+        applyFiltersAndSort(data);
+
+    }
+
+    function showSingleProduct(e, data) {
+        if (e.target.nodeName == "IMG" || e.target.classList.includes("browseResultProductTitle")) {
+            document.querySelector("#browse").classList.add("hidden");
+            document.querySelector("#singleProduct").classList.remove("hidden");
+
+            const id = e.target.id;
+
+            const found = data.find(p => p.id == id);
+
+            document.querySelector("#genderBC").textContent = found.gender;
+            document.querySelector("#categoryBC").textContent = found.category;
+            document.querySelector("#productName").textContent = found.name;
+
+            document.querySelector("#productImage").alt = found.name;
+
+            document.querySelector("#productTitle").textContent = found.name;
+            document.querySelector("#productPrice").textContent = "$" + found.price;
+            document.querySelector("#productDescriptionText").textContent = found.description;
+            document.querySelector("#productMaterial").textContent = found.material;
+        }
+    }
+
     function main(data) {
+        //sort data alphabetically initially
+        data.sort((a, b) => {
+                if (a.name < b.name) return -1;
+                if (a.name > b.name) return 1;
+                return 0;
+            });
+
         aboutPageHandler();
         document.querySelector("#filter").addEventListener('click', (e) => { populateFilter(e, data); });
         document.querySelector("nav").addEventListener('click', (e) => {navigationHandler(e)});
-    }
+        populateBrowsePage(data);
+        document.querySelector("#filter").addEventListener('change', () => {applyFiltersAndSort(data);});
+        document.querySelector("#sort").addEventListener('change', () => {applyFiltersAndSort(data);});
+        document.querySelector("#clear").addEventListener('click', () => {clearFilter(data);});
+    }   
+
 
 });

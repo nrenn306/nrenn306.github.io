@@ -84,9 +84,9 @@
             <div id="gender">
                 <p>Gender ▲</p>
                 <div class="hidden" id="genderCheckBox">
-                    <input type="checkbox" id="womens" name="womens" value="womens">
+                    <input type="checkbox" class="gender" id="womens" name="womens" value="womens">
                     <label for="womens">Womens</label>
-                    <input type="checkbox" id="mens" name="mens" value="mens">
+                    <input type="checkbox" class="gender" id="mens" name="mens" value="mens">
                     <label for="mens">Mens</label>
                 </div>
             </div>
@@ -122,34 +122,30 @@
                     <!--this is where filters will be added when selected and then cleared when the clear all button is clicked-->
                 </div>
             </div>
-            <div>
-                <template>
-                    <!---this is where we will create all the result product items based on the filters-->
-                    <img id="productImage" >
-                    <p>Title</p>
-                    <p>$price</p>
-                    <button id="add"></button>
-                </template>
-            </div>
+            <template>
+                <!---this is where we will create all the result product items based on the filters-->
+                <img class="productImage" src="https://placehold.co/150x200">
+                <p class="browseResultProductTitle"></p>
+                <p class="browseResultProductPrice"></p>
+                <button class="addBtn">Add</button>
+            </template>
+            <div id="browseResults"></div>
         </section>
     </article>
 
-    <article class="hidden" id="singleproduct">
+    <article class="hidden" id="singleProduct">
         <div id="breadcrumb">
             <a href="#">Home></a>
-            <a href="#" id="gender"></a>
-            <a href="#" id="category"></a>
+            <a href="#" id="genderBC"></a>
+            <a href="#" id="categoryBC"></a>
             <span id="productName"></span>
         </div>
 
-        <section class = "hidden" id="productPage">
-            <template id="productPageTemplate">
-                <img id="productImage">
-            </template>
+        <section id="productPage">
+                <img id="productImage" src="https://placehold.co/300x450">
         </section>
 
-        <section class = "hidden" id="productDescription">
-            <template id="productDescriptionTemplate">
+        <section id="productDescription">
                 <h1 id="productTitle"></h1>
                 <p id="productPrice"></p>
                 <p id="productDescriptionText"></p>
@@ -162,8 +158,7 @@
 
                 <div id="colourOptions"></div>
 
-                <button id="add">+ Add to Cart</button>
-            </template>
+                <button id="addBtn">+ Add to Cart</button>
         </section>
 
         <section id="relatedProducts">
