@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (cart.length === 0) {
             const newRow = document.createElement("tr");
-            newRow.innerHTML = "<td colspan='6' style='text-align:center; padding:20px;'> Your cart is empty </td>";
+            newRow.innerHTML = "<td colspan='6' style='text-align:center; padding:20px;'> Your cart is empty </td>"; // ADD STYLING IN CSS THIS IS FOR TESTING
             cartBody.appendChild(newRow);
             updateCartTotal();
             return;
