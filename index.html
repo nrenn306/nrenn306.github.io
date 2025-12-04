@@ -61,7 +61,7 @@
             <div class="product-grid">
                 <div class="product-card">
                     <img src="images/jacket.jpg" alt="Jacket">
-                    <p>Winter Jacket</p>
+                    <p>Jean Jacket</p>
                     <span>$129</span>
                 </div>
                 <div class="product-card">
@@ -71,8 +71,8 @@
                 </div>
                 <div class="product-card">
                     <img src="images/shirt.jpg" alt="Shirt">
-                    <p>Essential Tee</p>
-                    <span>$29</span>
+                    <p>Button Up Tee</p>
+                    <span>$39</span>
                 </div>
             </div>
         </section>
@@ -158,7 +158,7 @@
 
                 <div id="colourOptions"></div>
 
-                <button id="addBtn">+ Add to Cart</button>
+                <button id="singleAddBtn">+ Add to Cart</button>
         </section>
 
         <section id="relatedProducts">
@@ -193,30 +193,30 @@
                     </tr>
                 </thead>
                 <tbody id="cartBody">
-                    <template id="cartItemTemplate">
-                        <tr class="cartRow">
-                            
-                            <td class="cartItem">
-                                <button id="remove"></button>
-                                <img class="cartItemImage" src="https://placehold.co/150x200">
-                                <span class="cartItemTitle"></span>
-                            </td>
-
-                            <td class="cartItemColor"></td>
-
-                            <td class="cartItemSize"></td>
-
-                            <td class="cartItemPrice"></td>
-
-                            <td class="cartItemQuantity">
-                                <input type="number" class="quantityInput" min="1" value="1">
-                            </td>
-                            
-                            <td class="cartItemSubtotal"></td>
-
-                        </tr>
-                    </template>
                 </tbody>
+                <template id="cartItemTemplate">
+                    <tr class="cartRow">
+                        
+                        <td class="cartItem">
+                            <button class="removeBtn">Remove</button>
+                            <img class="cartItemImage" src="https://placehold.co/150x200">
+                            <span class="cartItemTitle"></span>
+                        </td>
+
+                        <td class="cartItemColor"></td>
+
+                        <td class="cartItemSize"></td>
+
+                        <td class="cartItemPrice"></td>
+
+                        <td class="cartItemQuantity">
+                            <input type="number" class="quantityInput" min="1" value="1">
+                        </td>
+                        
+                        <td class="cartItemSubtotal"></td>
+
+                    </tr>
+                </template>
             </table>
         </section>
 

@@ -351,7 +351,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             parent.appendChild(clone);
 
-            button.addEventListener('click', () => {addToCart();});
+            button.addEventListener('click', () => {
+                addToCart(d);
+                updateCart();
+            
+            });
             parent.addEventListener('click', (e) => showSingleProduct(e, data));
         }
     }
@@ -369,7 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showSingleProduct(e, data) {
-        if (e.target.nodeName == "IMG" || e.target.classList.includes("browseResultProductTitle")) {
+
+        const hasClass = e.target.classList && e.target.classList.contains("browseResultProductTitle");
+
+        if (e.target.nodeName == "IMG" || hasClass) {
             document.querySelector("#browse").classList.add("hidden");
             document.querySelector("#singleProduct").classList.remove("hidden");
 
@@ -401,11 +408,184 @@ document.addEventListener('DOMContentLoaded', () => {
         aboutPageHandler();
         document.querySelector("#filter").addEventListener('click', (e) => { populateFilter(e, data); });
         document.querySelector("nav").addEventListener('click', (e) => {navigationHandler(e)});
+
         populateBrowsePage(data);
+
         document.querySelector("#filter").addEventListener('change', () => {applyFiltersAndSort(data);});
         document.querySelector("#sort").addEventListener('change', () => {applyFiltersAndSort(data);});
         document.querySelector("#clear").addEventListener('click', () => {clearFilter(data);});
+
+        document.querySelector("#shippingMethod").addEventListener('change', ()=>{updateCartTotal();});
+        document.querySelector("#shippingLocation").addEventListener('change', ()=>{updateCartTotal();});
     }   
+
+    //everything shopping cart 
+    let cart = [];
+
+    function addToCart(product) {
+        let exists = false;
+        let productId = product.id;
+        console.log(productId);
+        for(let i=0; i < cart.length; i++) {
+            if(cart[i].id === productId) {
+                cart[i].quantity++;
+                exists = true;
+                break;
+            }
+        }
+        
+        if (!exists) {
+            let newProduct = JSON.parse(JSON.stringify(product));
+            newProduct.quantity = 1;
+            cart.push(newProduct);
+        }
+
+        updateCart();
+        updateCartCount();
+    }
+
+    function updateCartCount() {
+        let total = 0;
+        for (let i=0; i < cart.length; i++) {
+            total += cart[i].quantity;
+        }
+
+        document.querySelector("#cartCount").textContent = total;
+    }
+
+    function updateCart() {
+        const cartBody = document.querySelector("#cartBody");
+        const cartTemplate = document.querySelector("#cartItemTemplate");
+
+        if (!cartBody || !cartTemplate) {
+            return;
+        }
+
+        cartBody.innerHTML = "";
+
+        if (cart.length === 0) {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = "<td colspan='6' style='text-align:center; padding:20px;'> Your cart is empty </td>";
+            cartBody.appendChild(newRow);
+            updateCartTotal();
+            return;
+        }
+
+        for(let i=0; i<cart.length; i++) {
+            let item = cart[i]
+
+            const clone = cartTemplate.content.cloneNode(true);
+
+            clone.querySelector(".cartItemImage").src = "https://placehold.co/150x200";
+            clone.querySelector(".cartItemTitle").textContent = item.name;
+            clone.querySelector(".cartItemPrice").textContent = "$" + item.price.toFixed(2);
+
+            const colorColumn = clone.querySelector(".cartItemColor");
+            if (item.color && item.color.length > 0) {
+                colorColumn.textContent = item.color[0].name;
+            } else {
+                colorColumn.textContent = "-";
+            }
+
+            const sizeColumn = clone.querySelector(".cartItemSize");
+            if (item.size && item.sizes.length > 0) {
+                sizeColumn.textContent  = item.sizes[0];
+            } else {
+                sizeColumn.textContent = "-";
+            }
+
+            const quantityInput = clone.querySelector(".quantityInput");
+            quantityInput.value = item.quantity;
+
+            const subtotal = clone.querySelector(".cartItemSubtotal");
+            subtotal.textContent = "$" + (item.price*item.quantity).toFixed(2);
+
+            quantityInput.addEventListener("input", function(e) {
+                let q = parseInt(e.target.value);
+                if (isNaN(q) || q < 1) {
+                    q = 1;
+                }
+                
+                e.target.value = q;
+                item.quantity = q;
+                subtotal.textContent = "$" + (item.price*item.quantity).toFixed(2);
+                
+                updateCartTotal();
+                updateCartCount();
+            });
+
+            const removeBtn = clone.querySelector(".removeBtn");
+
+            removeBtn.dataset.id = item.id;
+
+            removeBtn.addEventListener("click", function(e) {
+                const productDelete = e.target.dataset.id;
+                const index = cart.findIndex(product => product.id == productDelete);
+
+                if (index !== -1) {
+                    cart.splice(index, 1);
+                    updateCart();
+                    updateCartCount();
+                    updateCartTotal();
+                }
+            });
+
+            cartBody.appendChild(clone);
+        }
+
+        updateCartTotal();
+    }
+
+    function updateCartTotal() {
+        let total = 0;
+        for (let i = 0; i < cart.length; i++) {
+            total += cart[i].price * cart[i].quantity;
+        }
+
+        document.querySelector("#merchTotal").textContent = "$" + total.toFixed(2);
+
+        shippingCost(total);
+    }
+
+    
+    function shippingCost(total) {
+        const shippingMethod = document.querySelector("#shippingMethod").value;
+        const shippingLocation = document.querySelector("#shippingLocation").value;
+        const shippingTotal = document.querySelector("#shippingTotal");
+        const taxTotal = document.querySelector("#taxTotal");
+        const orderTotal = document.querySelector("#orderTotal");
+
+        let shippingCost = 0;
+        let taxCost =  0;
+        let orderCost = 0;
+
+        if (total > 500) {
+            shippingCost = 0
+        } else {
+            const rates = {
+                standard:  { canada: 10, unitedStates: 15, international: 20 },
+                express:   { canada: 25, unitedStates: 25, international: 30 },
+                priority:  { canada: 35, unitedStates: 50, international: 50 }
+            };
+
+            if(total > 500) {
+                shippingCost = 0;
+            } else if (total > 0) {
+                shippingCost = rates[shippingMethod][shippingLocation];
+            } 
+        }
+
+        if (shippingLocation === "canada") {
+            taxCost = total * 0.05;
+        }
+
+        orderCost = total + shippingCost + taxCost;
+
+        shippingTotal.textContent = "$" + shippingCost.toFixed(2);
+        taxTotal.textContent = "$" + taxCost.toFixed(2);
+        orderTotal.textContent = "$" + orderCost.toFixed(2);
+
+    }
 
 
 });
