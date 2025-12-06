@@ -153,9 +153,9 @@
 
     <article class="hidden" id="singleProduct">
         <div id="breadcrumb">
-            <a href="#">Home></a>
-            <a href="#" id="genderBC"></a>
-            <a href="#" id="categoryBC"></a>
+            <a id="home">Home ></a>
+            <a id="genderBC"></a>
+            <a id="categoryBC"></a>
             <span id="productName"></span>
         </div>
 
@@ -174,7 +174,17 @@
                     <input type="number" id="qtyInput" min="1" value="1">
                 </div>
 
-                <div id="colourOptions"></div>
+                <div id="colourOptions">
+                    <select id="colorSelect">
+                        <option value="">Select Color</option>
+                    </select>
+                </div>
+
+                <div id="sizeOptions">
+                    <select id="sizeSelect">
+                        <option value="">Select Size</option>
+                    </select>
+                </div>
 
                 <button id="singleAddBtn">+ Add to Cart</button>
         </section>
@@ -182,15 +192,21 @@
         <section id="relatedProducts">
             <h2>Related Products</h2>
 
+            <template id="relatedProductTemplate">
+                <li class="relatedCard">
+                    <img class="relatedImage" src="https://placehold.co/150x200">
+                    <h3 class="relatedTitle"></h3>
+                    <p class="relatedPrice"></p>
+                    <select class="relatedSizeSelect">
+                        <option value="">Select Size</option>
+                    </select>
+                    <select class="relatedColorSelect">
+                        <option value="">Select Color</option>
+                    </select>
+                    <button class="relatedAddBtn">Add</button>
+                </li>
+            </template>
             <ul id="relatedList">
-                <template id="relatedProductTemplate">
-                    <li class="relatedCard">
-                        <img class="relatedImage" src="https://placehold.co/150x200">
-                        <h3 class="relatedTitle"></h3>
-                        <p class="relatedPrice"></p>
-                        <button class="add">+</button>
-                    </li>
-                </template>
             </ul>
         </section>
 

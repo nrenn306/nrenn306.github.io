@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 return response.json();
             } else {
-                throw new error("fetch failed");
+                throw new Error("fetch failed");
             }
         })
         .then(data => {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // toggles triangle for browse filter 
-    function toggleTriagngle(name) {
+    function toggleTriangle(name) {
         const p = document.querySelector("#" + name + " p");
         p.textContent = p.textContent.endsWith('▲')
             ? p.textContent.replace('▲', '▼')
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         categoryCheckBox.innerHTML = "";
 
-        toggleTriagngle("category");
+        toggleTriangle("category");
 
         const categories = [];
         for (let product of data) {
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         sizeCheckBox.innerHTML = "";
 
-        toggleTriagngle("size");
+        toggleTriangle("size");
 
         const sizes = [];
         for (let product of data) {
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         colorsCheckBox.innerHTML = "";
 
-        toggleTriagngle("colors");
+        toggleTriangle("colors");
 
         const colors = [];
         for (let product of data) {
@@ -187,24 +187,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.nodeName == "P") {
                 if (e.target.textContent.includes("Gender")) {
                     document.querySelector("#genderCheckBox").classList.toggle("hidden");
-                    toggleTriagngle("gender")
+                    toggleTriangle("gender")
                 } else if (e.target.textContent.includes("Category")) {
                     populateCategoryFilter(data);
                 } else if (e.target.textContent.includes("Size")) {
                     populateSizeFilter(data);
                 } else if (e.target.textContent.includes("Colors")) {
                     populateColorsFilter(data);
-                }
+                } 
             }
     }
 
+    const home = document.querySelector("#home");
+    const browse = document.querySelector("#browse");
+    const about = document.querySelector("#about");
+    const shoppingCart = document.querySelector("#shoppingCart");
+
     // navigation
     function navigationHandler(e) {
-        const home = document.querySelector("#home");
-        const browse = document.querySelector("#browse");
-        const about = document.querySelector("#about");
-        const shoppingCart = document.querySelector("#shoppingCart");
-        
         document.querySelector("#singleProduct").classList.add("hidden");
 
         if(e.target.nodeName == "IMG") {
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (clickedNav === "Home") {showView("home"); return;}
             if (clickedNav === "Browse") {showView("browse"); return;}
             if (clickedNav === "About") {document.querySelector("#about").showModal(); return;}
-        } else if (e.target.nodeName == "H3") {
+        } else if (e.target.nodeName == "H3" || e.target.id === "cartCount") {
             showView("shoppingCart");
         }
     }
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 colorSelect.value = "";
             });
 
-            parent.addEventListener('click', (e) => showSingleProduct(e, data));
+            
         }
     }
 
@@ -413,19 +413,126 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const id = e.target.id;
 
-            const found = data.find(p => p.id == id);
+            const productData = data.find(p => p.id == id);
 
-            document.querySelector("#genderBC").textContent = found.gender;
-            document.querySelector("#categoryBC").textContent = found.category;
-            document.querySelector("#productName").textContent = found.name;
+            document.querySelector("#genderBC").textContent = productData.gender;
+            document.querySelector("#categoryBC").textContent = " > " + productData.category;
+            document.querySelector("#productName").textContent = " > " + productData.name;
 
-            document.querySelector("#productImage").alt = found.name;
+            document.querySelector("#productImage").alt = productData.name;
 
-            document.querySelector("#productTitle").textContent = found.name;
-            document.querySelector("#productPrice").textContent = "$" + found.price;
-            document.querySelector("#productDescriptionText").textContent = found.description;
-            document.querySelector("#productMaterial").textContent = found.material;
+            document.querySelector("#productTitle").textContent = productData.name;
+            document.querySelector("#productPrice").textContent = "$" + productData.price;
+            document.querySelector("#productDescriptionText").textContent = productData.description;
+            document.querySelector("#productMaterial").textContent = productData.material;
+
+            const colorSelect = document.querySelector("#colorSelect");
+            const sizeSelect = document.querySelector("#sizeSelect");
+
+            colorSelect.innerHTML = `<option value="">Select Color</option>`;
+            productData.color.forEach (c=> {
+                const option = document.createElement("option");
+                option.value = c.name;
+                option.textContent = c.name;
+                colorSelect.appendChild(option);
+            });
+
+            sizeSelect.innerHTML = `<option value="">Select Size</option>`;
+            productData.sizes.forEach(s => {
+                const option = document.createElement("option");
+                option.value = s;
+                option.textContent = s; 
+                sizeSelect.appendChild(option);
+            });
+
+            document.querySelector("#singleAddBtn").addEventListener('click', () => {
+                const selectedSize = document.querySelector("#sizeSelect").value;
+                const selectedColor = document.querySelector("#colorSelect").value;
+                const selectedQuantity = parseInt(document.querySelector("#qtyInput").value);
+
+                if (!selectedSize || !selectedColor) {
+                    alert("Please select a size and a color.");
+                    return;
+                }
+
+                if (selectedQuantity <= 0) {
+                    alert("Please enter a valid quantity.");
+                    return;
+                }
+
+                for (let i = 0; i < selectedQuantity; i++) {
+                    addToCart(productData, selectedSize, selectedColor);
+                }
+                document.querySelector("#sizeSelect").value = "";
+                document.querySelector("#colorSelect").value = "";
+                document.querySelector("#qtyInput").value = "1";
+            });
+
+            loadRelatedProducts(productData, data);
         }
+    }
+
+    function loadRelatedProducts(productData, data) {
+        //show related products based on category
+        let related = data.filter(p => p.category === productData.category && p.id !== productData.id);
+
+        //if there are less than 4 related options, show options based on gender
+        if (related.length < 4) {
+            const sameGender = data.filter(p => p.gender === productData.gender && p.id !== productData.id);
+            related.push(...sameGender);
+        }
+
+        related = related.slice(0,4);
+
+        const relatedList = document.querySelector("#relatedList");
+        relatedList.innerHTML = "";
+
+        const template = document.querySelector("#relatedProductTemplate");
+
+        related.forEach(product=> {
+            const clone = template.content.cloneNode(true);
+
+            clone.querySelector(".relatedImage").src = "https://placehold.co/150x200";
+            clone.querySelector(".relatedTitle").textContent = product.name;
+            clone.querySelector(".relatedPrice").textContent = "$" + product.price;
+
+            // Populate size select
+            const sizeSelect = clone.querySelector(".relatedSizeSelect");
+            product.sizes.forEach(size => {
+                const option = document.createElement("option");
+                option.value = size;
+                option.textContent = size;
+                sizeSelect.appendChild(option);
+            });
+            
+            // Populate color select
+            const colorSelect = clone.querySelector(".relatedColorSelect");
+            product.color.forEach (color => {
+                const option = document.createElement("option");
+                option.value = color.name;
+                option.textContent = color.name;
+                colorSelect.appendChild(option);
+            });
+            
+            // Add button functionality
+            const addBtn = clone.querySelector(".relatedAddBtn");
+            addBtn.addEventListener('click', (e) => {
+                const selectedSize = sizeSelect.value;
+                const selectedColor = colorSelect.value;
+                
+                if (!selectedSize || !selectedColor) {
+                    alert("Please select a size and a color.");
+                    return;
+                }
+                
+                addToCart(product, selectedSize, selectedColor);
+                sizeSelect.value = "";
+                colorSelect.value = "";
+            });
+            
+            relatedList.appendChild(clone);
+
+        });
     }
 
     function main(data) {
@@ -448,9 +555,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector("#shippingMethod").addEventListener('change', ()=>{updateCartTotal();});
         document.querySelector("#shippingLocation").addEventListener('change', ()=>{updateCartTotal();});
-    }   
 
-    //everything shopping cart 
+        parent.addEventListener('click', (e) => showSingleProduct(e, data));
+    }
+
+     
     let cart = [];
 
     function addToCart(product, selectedSize, selectedColor) {
@@ -488,6 +597,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartCount();
     }
 
+
+    //updates the number of items in the cart
     function updateCartCount() {
         let total = 0;
         for (let i=0; i < cart.length; i++) {
@@ -497,6 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector("#cartCount").textContent = total;
     }
 
+    //updates the table for cart items
     function updateCart() {
         const cartBody = document.querySelector("#cartBody");
         const cartTemplate = document.querySelector("#cartItemTemplate");
@@ -578,6 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartTotal();
     }
 
+    //calculates the cost for items in the cart
     function updateCartTotal() {
         let total = 0;
         for (let i = 0; i < cart.length; i++) {
@@ -590,6 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     
+    //calculates order cost including shipping and taxes based on shipping method and location
     function shippingCost(total) {
         const shippingMethod = document.querySelector("#shippingMethod").value;
         const shippingLocation = document.querySelector("#shippingLocation").value;
