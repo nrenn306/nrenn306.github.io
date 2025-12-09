@@ -596,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateCart();
         updateCartCount();
-        showAddToCartToast();
+        showToast("Item added to cart!");
         
     }
 
@@ -750,33 +750,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    function showAddToCartToast() {
-        const container = document.querySelector(".toastContainer");
-        const toast = document.createElement("div");
-        toast.classList.add("toast", "hidden"); 
-        toast.textContent = "Item added to cart!";
-
-        container.appendChild(toast);
-
-        setTimeout(() => {
-            toast.classList.remove("hidden");
-        }, 10);
-
-        setTimeout(() => {
-            toast.classList.add("hidden");
-            setTimeout(() => {
-                container.removeChild(toast);
-            }, 500);
-        }, 2000);
-    }
-
-
-    function showToastAndClear() {
+    function showToast(text) {
         if (cart.length != 0) {
             const container = document.querySelector(".toastContainer");
             const toast = document.createElement("div");
             toast.classList.add('toast');
-            toast.textContent = "Your order has been submitted!";
+            toast.textContent = text;
 
             container.appendChild(toast);
 
@@ -790,12 +769,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     container.removeChild(toast);
                 }, 500);
             }, 3000);
-
-            cart.length = 0;
-            updateCart();
-            updateCartCount();
         }
         
+    }
+
+    function clearCart() {
+        cart.length = 0;
+        updateCart();
+        updateCartCount();
     }
 
     function main(data) {
@@ -816,7 +797,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector("#shippingMethod").addEventListener('change', () => {updateCartTotal();});
         document.querySelector("#shippingLocation").addEventListener('change', () => {updateCartTotal();});
-        document.querySelector("#checkoutButton").addEventListener('click', () => {showToastAndClear()});
+        document.querySelector("#checkoutButton").addEventListener('click', () => {showToast("Your order has been submitted!");
+            clearCart();
+        });
     }   
 
 
