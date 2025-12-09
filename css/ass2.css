@@ -1865,3 +1865,58 @@ template {
 .addBtn:active {
     transform: translateY(0);
 }
+
+/* ==================== TOAST NOTIFICATIONS ==================== */
+.toastContainer {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #d4b896 100%);
+    color: var(--primary-color);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(201, 169, 97, 0.35);
+    font-weight: 600;
+    font-size: 0.95rem;
+    animation: slideInUp 0.4s ease, slideOutDown 0.4s ease 3.6s forwards;
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}
+
+.toast.hidden {
+    display: none;
+}
