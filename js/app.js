@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         categories.sort();
         
         for (let c of categories) {
+            const container = document.createElement("div");
+            container.classList.add("filter-item");
+
             const input = document.createElement("input");
             input.type = "checkbox";
             input.classList.add("category");
@@ -74,8 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
             label.textContent = c;
             label.setAttribute("for", c);
 
-            categoryCheckBox.appendChild(input);
-            categoryCheckBox.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(label);
+            categoryCheckBox.appendChild(container);
         }
     }
 
@@ -98,6 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         for (let s of sizes) {
+            const container = document.createElement("div");
+            container.classList.add("filter-item");
+
             const input = document.createElement("input");
             input.type = "checkbox";
             input.classList.add("size");
@@ -110,8 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
             label.textContent = s;
             label.setAttribute("for", s);
 
-            sizeCheckBox.appendChild(input);
-            sizeCheckBox.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(label);
+            sizeCheckBox.appendChild(container);
         }
     }
 
@@ -141,6 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         for (let c of colors) {
+            const container = document.createElement("div");
+            container.classList.add("filter-item");
+
             const input = document.createElement("input");
             input.type = "checkbox";
             input.classList.add("color");
@@ -160,9 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
             div.style.border = "1px solid black";
             div.setAttribute("for", c.name);
 
-            colorsCheckBox.appendChild(input);
-            colorsCheckBox.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(label);
             label.appendChild(div);
+            colorsCheckBox.appendChild(container);
         }
     }
 
