@@ -708,22 +708,36 @@ footer a:hover {
     font-size: 1rem;
 }
 
-.relatedCard .add {
+.relatedCard .add,
+.relatedAddBtn {
     width: 100%;
-    padding: 8px;
+    padding: 10px 12px;
     background: var(--primary-color);
     color: var(--white);
-    border: none;
+    border: 2px solid var(--primary-color);
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.8rem;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.relatedCard .add:hover {
+.relatedCard .add:hover,
+.relatedAddBtn:hover {
     background: var(--accent-color);
+    border-color: var(--accent-color);
     color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.relatedCard .add:active,
+.relatedAddBtn:active {
+    transform: translateY(0);
 }
 
 /* ==================== SHOPPING CART ==================== */
@@ -991,25 +1005,36 @@ dialog a:hover {
 
 #x,
 #close {
-    padding: 8px 12px;
-    background: var(--secondary-color);
-    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    background: var(--primary-color);
+    color: var(--white);
+    border: 2px solid var(--primary-color);
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.85rem;
     transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #x {
     float: right;
-    margin: -30px -30px 15px 0;
+    margin: -35px -35px 20px 0;
+}
+
+#close {
+    margin-top: 20px;
 }
 
 #x:hover,
 #close:hover {
-    background: var(--text-light);
-    color: var(--white);
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
