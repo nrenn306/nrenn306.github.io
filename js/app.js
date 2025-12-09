@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param data The product data 
      */
     function showSingleProductById(id, data) {
-        // had to look this up on google 
+        // had to look this up on google (it was in the AI overview section so no particular website)
         const fakeEvent = { target: { id: id, nodeName: "IMG" } };
         showSingleProduct(fakeEvent, data);
     }
